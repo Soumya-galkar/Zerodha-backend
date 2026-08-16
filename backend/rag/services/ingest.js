@@ -1,7 +1,7 @@
 const extractTextFromPDF = require("../parser/pdfParser");
 const { splitText } = require("../chunking/chunker");
 const { getEmbedding } = require("../embeddings/embedder");
-const { addDocument } = require("../vectordb/faiss");
+const { addDocument } = require("../vectorDB/faiss");
 
 async function ingestDocument(filePath) {
     console.log("Extracting PDF...");
