@@ -96,6 +96,12 @@ app.use("/rag/chat", chatRoute);
 
 app.use("/", authRoute);
 
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Zerodha backend is running"
+    });
+});
 
 // =========================
 // Server
