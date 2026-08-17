@@ -1,6 +1,7 @@
 function buildContext(chunks) {
     return chunks
-        .map((chunk) => chunk.text)
+        .map((chunk) => chunk.chunk_text)
+        .filter(Boolean)
         .join("\n\n");
 }
 
