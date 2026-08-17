@@ -1,6 +1,5 @@
 
 
-
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -84,7 +83,9 @@ app.post("/newOrder", async (req, res) => {
 });
 
 
-
+// =========================
+// RAG Routes
+// =========================
 
 app.use("/rag", uploadRoute);
 app.use("/rag/chat", chatRoute);
@@ -96,12 +97,6 @@ app.use("/rag/chat", chatRoute);
 
 app.use("/", authRoute);
 
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "Zerodha backend is running"
-    });
-});
 
 // =========================
 // Server
