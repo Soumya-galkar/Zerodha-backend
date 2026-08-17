@@ -1,19 +1,92 @@
+// const express = require("express");
+// const multer = require("multer");
+// const path = require("path");
+
+// const router = express.Router();
+
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, path.join(__dirname, "../uploads"));
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + path.extname(file.originalname));
+//     }
+// });
+// const upload = multer({
+//     storage,
+//     fileFilter: (req, file, cb) => {
+//         if (file.mimetype === "application/pdf") {
+//             cb(null, true);
+//         } else {
+//             cb(new Error("Only PDF files are allowed"));
+//         }
+//     }
+// });
+
+// const ingestModule = require("../services/ingest");
+
+// console.log("INGEST MODULE:", ingestModule);
+
+// const { ingestDocument } = ingestModule;
+// router.post("/upload", upload.single("pdf"), async (req, res) => {
+//     try {
+//         if (!req.file) {
+//             return res.status(400).json({ error: "No file uploaded" });
+//         }
+
+//        const filePath = req.file.path;
+
+// // Ingest the document into FAISS
+// const totalChunks = await ingestDocument(filePath);
+
+// res.status(200).json({
+//     success: true,
+//     message: "PDF uploaded and indexed successfully",
+//     chunks: totalChunks
+// });
+//     } catch (error) {
+//         console.error("Error processing PDF:", error);
+//         res.status(500).json({ error: "Failed to process PDF" });
+//     }
+// });
+
+// module.exports = router;
+
+
+
+
+
+
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const router = express.Router();
 
+// Upload directory
+const uploadDir = path.join(__dirname, "../uploads");
+
+// Create directory if it doesn't exist
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+console.log("Upload directory:", uploadDir);
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../uploads"));
+        cb(null, uploadDir);
     },
+
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
+
 const upload = multer({
     storage,
+
     fileFilter: (req, file, cb) => {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -28,25 +101,42 @@ const ingestModule = require("../services/ingest");
 console.log("INGEST MODULE:", ingestModule);
 
 const { ingestDocument } = ingestModule;
+
 router.post("/upload", upload.single("pdf"), async (req, res) => {
+
     try {
+
         if (!req.file) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({
+                error: "No file uploaded"
+            });
         }
 
-       const filePath = req.file.path;
+        const filePath = req.file.path;
 
-// Ingest the document into FAISS
-const totalChunks = await ingestDocument(filePath);
+        console.log("PDF uploaded successfully");
+        console.log("File path:", filePath);
 
-res.status(200).json({
-    success: true,
-    message: "PDF uploaded and indexed successfully",
-    chunks: totalChunks
-});
+        // Ingest PDF into FAISS
+        const totalChunks = await ingestDocument(filePath);
+
+        console.log("PDF ingestion completed");
+        console.log("Total chunks:", totalChunks);
+
+        res.status(200).json({
+            success: true,
+            message: "PDF uploaded and indexed successfully",
+            chunks: totalChunks
+        });
+
     } catch (error) {
+
         console.error("Error processing PDF:", error);
-        res.status(500).json({ error: "Failed to process PDF" });
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
 
