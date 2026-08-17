@@ -1,5 +1,6 @@
+
 const { getEmbedding } = require("../embeddings/embedder");
-const { search } = require("../vectorDB/faiss");
+const { searchChunks } = require("../../services/supabaseVector");
 
 async function retrieveRelevantChunks(question, k = 5) {
 
@@ -7,9 +8,22 @@ async function retrieveRelevantChunks(question, k = 5) {
 
     const queryEmbedding = await getEmbedding(question);
 
-    console.log("Searching FAISS...");
+    console.log(
+        "Query embedding length:",
+        queryEmbedding.length
+    );
 
-    const results = search(queryEmbedding, k);
+    console.log("Searching Supabase pgvector...");
+
+    const results = await searchChunks(
+        queryEmbedding,
+        k
+    );
+
+    console.log(
+        "Retrieved chunks:",
+        results.length
+    );
 
     return results;
 }
