@@ -1,4 +1,5 @@
 
+
 const { IndexFlatL2 } = require("faiss-node");
 
 const dimension = 3072;
